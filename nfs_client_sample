@@ -4,7 +4,7 @@ sudo useradd -G nfsusers user1
 echo "sample" | sudo passwd --stdin user1
 sudo yum install nfs-utils -y
 sudo mkdir -p /nfs/imports/share
-echo "remoteip:/nfs/exports/share /nfs/imports/share nfs defaults 0 0" | sudo tee -a /etc/fstab
+echo "10.0.1.4:/nfs/exports/share /nfs/imports/share nfs defaults 0 0" | sudo tee -a /etc/fstab
 sudo mount -fav
 if [ $? -eq 0 ]; then
   sudo mount -a

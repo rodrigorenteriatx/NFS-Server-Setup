@@ -1,0 +1,73 @@
+---
+# tasks file for roles/nsf_server
+# sudo yum install nfs-utils -y
+# sudo systemctl enable --now rpcbind
+# sudo systemctl enable --now nfs-server
+# sudo mkdir -p /nfs/exports/share
+# sudo groupadd nfsusers
+# sudo useradd -G nfsusers nfsadmin
+# echo "sample" | sudo passwd --stdin nfsadmin
+# sudo chown root:nfsusers /nfs/exports/share
+# sudo chmod 775 /nfs/exports/share
+# echo "/nfs/exports/share 10.0.1.0/28(rw)" | sudo tee -a /etc/exports
+# sudo exportfs -rav
+# sudo systemctl restart nfs-server
+- name: Install nfs-utils
+  yum:
+    name: nfs-utils
+    state: present
+
+- name: Start and enable rpcbind AND nfs-server
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - rpcbind
+    - nfs-server
+
+- name: Create nfsusers group
+  group:
+    name: nfsusers
+
+- name: Create NFS share directory AND set permissions
+  file:
+    path: "/nfs/exports/share"
+    state: directory
+    owner: root
+    group: nfsusers
+    mode: '0775'
+
+- name: Create a test file in the share directory
+  file:
+    path: "test.txt"
+    state: touch
+
+- name: Echo "hello" to "test.txt"
+  shell: echo "hello" > /nfs/exports/share/test.txt
+
+- name: Create nfsadmin user
+  user:
+    name: nfsadmin
+    groups: nfsusers
+    password: "{{ 'sample' | password_hash('sha512') }}"
+    append: yes
+
+- name: Add NFS share to /etc/exports
+  lineinfile:
+    path: "/etc/exports"
+    line: "/nfs/exports/share 10.0.1.0/28(rw)"
+
+
+- name: Run Exportfs -rav
+  command: exportfs -rav
+  register: result
+
+- name: Show exports result
+  debug:
+    var: result
+
+- name: Restart nfs-server
+  systemd:
+    name: nfs-server
+    state: restarted

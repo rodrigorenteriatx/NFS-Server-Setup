@@ -1,0 +1,77 @@
+---
+# tasks file for roles/nsf_client
+# sudo groupadd nfsusers
+# sudo useradd -G nfsusers user1
+# echo "sample" | sudo passwd --stdin user1
+# sudo yum install nfs-utils -y
+# sudo mkdir -p /nfs/imports/share
+# echo "10.0.1.4:/nfs/exports/share /nfs/imports/share nfs defaults 0 0" | sudo tee -a /etc/fstab
+# sudo mount -fav
+# if [ $? -eq 0 ]; then
+#   sudo mount -a
+#   echo "NFS mount successful"
+# else
+#   echo "NFS mount failed"
+# fi
+
+- name: Create group nfsusers
+  group:
+    name: nfsusers
+    state: present
+
+- name: Create user user1 with nfsusers appended
+  user:
+    name: user1
+    groups: nfsusers
+    state: present
+    append: yes
+
+- name: Set password for user1
+  user:
+    name: user1
+    password: "{{ 'sample' | password_hash('sha512') }}"
+    state: present
+
+- name: Install nfs-utils
+  yum:
+    name: nfs-utils
+    state: present
+
+- name: Create NFS import directory
+  file:
+    path: "/nfs/imports/share"
+    state: directory
+    mode: '0775'
+    owner: root
+    group: nfsusers
+
+- name: Add NFS share to /etc/fstab
+  lineinfile:
+    path: "/etc/fstab"
+    line: "{{nfs_server}}:/nfs/exports/share /nfs/imports/share nfs defaults 0 0"
+
+# The mount command in Linux is used to mount filesystems. The -fav options are a combination of three separate flags:
+
+# -f (fake mount)
+# -a (mount all)
+# -v (verbose)
+
+- name: Mount NFS share
+  command: "mount -av"
+  register: mount_result
+  ignore_errors: yes
+
+- name: Check if NFS mount was successful
+  debug:
+    msg: "NFS mount successful"
+  when: mount_result.rc == 0
+
+- name: output the contents of the test.txt file in the NFS share
+  shell: cat /nfs/imports/share/test.txt
+  register: test_file
+  ignore_errors: yes
+
+- name: Show contents of test.txt
+  debug:
+    var: test_file.stdout
+  when: test_file.rc == 0

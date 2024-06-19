@@ -3,10 +3,12 @@
 sudo yum install nfs-utils -y
 sudo systemctl enable --now rpcbind
 sudo systemctl enable --now nfs-server
-mkdir -p /nfs/exports/share
-groupadd nfsusers
-chown root:nfsusers /nfs/exports/share
-chmod 775 /nfs/exports/share
+sudo mkdir -p /nfs/exports/share
+sudo groupadd nfsusers
+sudo useradd -G nfsusers nfsadmin
+echo "sample" | sudo passwd --stdin nfsadmin
+sudo chown root:nfsusers /nfs/exports/share
+sudo chmod 775 /nfs/exports/share
 echo "/nfs/exports/share 10.0.1.0/28(rw)" | sudo tee -a /etc/exports
 sudo exportfs -rav
 sudo systemctl restart nfs-server

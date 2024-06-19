@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# This will run the terraform config to create the servers, then after provisioned, run the playbooks
+create_NFS_yml() {
+  if [ -f "NFS_Setup.yml" ]; then
+    echo "NFS_Setup.yml exists. Proceeding with the setup."
+  else
+    echo "NFS_Setup.yml does not exist. Creating Ansible directory"
+    bash ./prereq
+  fi
+  }
+
+run_terraform() {
+  echo "Running Terraform"
+# Run the terraform config
+  terraform destroy -auto-approve
+  terraform apply -auto-approve
+  sleep 60
+  if [ $? -eq 0 ]; then
+    echo "Terraform ran successfully. Proceeding with Ansible."
+  else
+    echo "Terraform failed. Exiting."
+    exit 1
+  fi
+}
+
+run_ansible() {
+  echo "Running Ansible"
+  ansible-playbook NFS_Setup.yml
+}
+
+create_and_configure() {
+  echo "Creating and configuring the servers"
+  read -p "OPTIONS: 1 - Run Whole Setup  | 2 - Run Playbooks Only: " option
+  # takes a string "1 or 2"
+    case $option in
+        1)
+        create_NFS_yml
+        run_terraform
+        run_ansible
+        ;;
+        2)
+        run_ansible
+        ;;
+        *)
+        echo "Invalid option. Exiting."
+        exit 1
+        ;;
+    esac
+}
+
+create_and_configure

@@ -34,4 +34,4 @@ override.tf.json
 terraform.rc
 
 hosts.ini
-
+ansible.cfg

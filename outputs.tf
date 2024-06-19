@@ -1,5 +1,5 @@
 resource "local_file" "hosts_ini" {
-    filename = "hosts.ini"
+    filename = "./inventory/hosts.ini"
     content = <<EOF
 [nfs_server]
 ${aws_instance.NFS.public_ip}
@@ -30,6 +30,13 @@ become_user = root
 become_ask_pass = False
   EOF
 
+}
+
+resource "local_file" "group-vars-nfs-ips" {
+  filename = "group_vars/all.yml"
+  content = <<EOF
+nfs_server: ${aws_instance.NFS.private_ip}
+EOF
 }
 
 resource "local_file" "private_ip_txt" {

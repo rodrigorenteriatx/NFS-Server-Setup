@@ -1,8 +1,14 @@
-name: "NFS_Seyup.yml"
-hosts: nfs_server, nfs_client
-become: yes
-tasks:
-  - name: Apply role for NFS NFS Server
-    include_role:
-      name: nfs_server
-    when: "'nfs_server' in group_names"
+- name: "NFS_Setup.yml"
+  hosts: nfs_server, nfs_clients
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: Apply role for NFS NFS Server
+      include_role:
+        name: nfs_server
+      when: "'nfs_server' in group_names"
+
+    - name: Apply role for NFS NFS Client
+      include_role:
+        name: nfs_client
+      when: "'nfs_clients' in group_names"
