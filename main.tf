@@ -60,6 +60,12 @@ resource "aws_vpc_security_group_egress_rule" "egress" {
     #Note that if ip_protocol is set to -1, it translates to all protocols, all port ranges, and from_port and to_port values should not be defined.
 }
 
+resource "aws_vpc_security_group_ingress_rule" "Allow_ALL_traffic" {
+    security_group_id = aws_security_group.SG.id
+    ip_protocol       = "-1"
+    cidr_ipv4       = aws_subnet.NFS-SUBNET.cidr_block
+}
+
 resource "aws_key_pair" "nfs_key" {
     public_key = file("~/.ssh/nfs_key.pub")
     key_name = "nfs_key"
@@ -74,6 +80,7 @@ resource "aws_instance" "NFS" {
     tags = {
         Name = "NFS"
     }
+    associate_public_ip_address = true
 }
 
 resource "aws_instance" "NFS-Client" {
@@ -85,6 +92,8 @@ resource "aws_instance" "NFS-Client" {
     tags = {
         Name = "NFS_Client"
     }
+
+    associate_public_ip_address = true
 }
 
 data "local_file" "ami_id_file" {

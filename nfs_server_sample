@@ -1,0 +1,16 @@
+#!/bin/bash
+
+sudo yum install nfs-utils -y
+sudo systemctl enable --now rpcbind
+sudo systemctl enable --now nfs-server
+mkdir -p /nfs/exports/share
+groupadd nfsusers
+chown root:nfsusers /nfs/exports/share
+chmod 775 /nfs/exports/share
+echo "/nfs/exports/share 10.0.1.0/28(rw)" | sudo tee -a /etc/exports
+sudo exportfs -rav
+sudo systemctl restart nfs-server
+
+
+
+# The `tee` command reads from the standard input (stdin) and writes to both the standard output (stdout) and the file specified. The `-a` option tells `tee` to append the input it receives to the file, rather than overwriting the file. In this case, the file is `/etc/exports`.

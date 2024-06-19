@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# 16 total ips, 14 usable
+#meant for 10.0.1.0/28
+
+# .0 NETWORK ADDRESS
+# .15 BROADCAST ADDRESS
+# -W 1 timeout in seconds (WAY FASTER)
+
+for i in $(seq 1 14); do
+    echo "pinging 10.0.1.$i"
+    ping "10.0.1.$i" -c 1 -W 1 | grep "bytes from" | cut -d " " -f 4 | cut -d ":" -f 1 &
+done
+\

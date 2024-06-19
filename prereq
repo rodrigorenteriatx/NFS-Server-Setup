@@ -6,9 +6,10 @@
 python "${PWD}/retrieve_latest_ami.py"
 
 #Create simple ansible playbook directory structure
-touch ansible.cfg
 mkdir -p inventory/group_vars
 mkdir -p inventory/host_vars
 mkdir -p roles/
+ansible-galaxy init roles/nsf_client
+ansible-galaxy init roles/nsf_server
 
-
+touch NFS_Setup.yml
