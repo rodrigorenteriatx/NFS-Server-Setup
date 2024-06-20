@@ -1,19 +1,18 @@
-# Terraform AWS Linux Server and Client Provisioning
+# Provisioning Linux NFS Server and Client with Terraform
 
-This repository automates the provisioning of a Linux server and client infrastructure on AWS using Terraform. It includes setting up essential networking components, security groups, SSH key association, and leveraging Python and Ansible for streamlined configuration.
+This project automates the setup of a Linux NFS server and NFS client using Terraform on AWS. It includes provisioning essential AWS infrastructure components like VPC, subnet, gateway, route table, security groups, and EC2 instances. Additionally, Python and Bash scripts facilitate fetching the latest Amazon Linux AMI and preparing Ansible directories, respectively.
 
 ## Features
 
-- Automatically provisions AWS VPC, subnet, gateway, route table, route association, and security groups using Terraform.
-- Uses a Python script (`retrieve_latest_ami.py`) with Boto3 to fetch the latest Amazon Linux 2023 AMI for EC2 instances in Terraform.
-- Prepares Ansible directories with a Bash script (`prereq.sh`) and sets up templates for server configuration roles.
-- Includes a script (`create_and_configure.sh`) to orchestrate environment setup, execute Terraform commands, and run Ansible playbooks.
-- Utilizes Ansible to configure server roles, including NFS setup, and provides a result to verify NFS sharing success.
+- Automated provisioning of VPC, subnet, gateway, route table, route association, and security groups on AWS.
+- Configuration of EC2 instances with the latest Amazon Linux AMI using Terraform.
+- Integration of Python script (`retrieve_latest_ami.py`) to fetch the most recent Amazon Linux AMI for Terraform.
+- Preparation of Ansible directories using a Bash script (`prereq`).
+- Setup of NFS server and client configurations using Ansible playbooks.
+- Creation of shared directories and validation of NFS sharing functionality.
 
-## Scripts Overview
+## Scripts
 
-- **retrieve_latest_ami.py**: Python script using Boto3 to fetch the latest Amazon Linux 2023 AMI ID for Terraform provisioning.
-  
-- **prereq.sh**: Bash script to prepare Ansible directories and templates for server configuration roles.
-
-- **create_and_configure.sh**: Bash script to orchestrate environment setup, Terraform provisioning, and Ansible playbook execution.
+- `retrieve_latest_ami.py`: Fetches the latest Amazon Linux AMI using Boto3 for Terraform provisioning.
+- `prereq`: Prepares Ansible directories for playbook execution.
+- `create_and_configure.sh`: Automates environment setup, runs Terraform commands, and executes Ansible playbooks (`NFS_Setup.yml`) to configure NFS server and client.
